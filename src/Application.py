@@ -9,7 +9,6 @@ maxValues = 900
 dbList = [0] * maxValues
 index = 0
 awsDelay = 0
-laeq = 0
 
 def initUsb():
     global dev
@@ -19,7 +18,6 @@ def initUsb():
     # print 'Hex : ' + (hex(dev.idVendor) + ',' + hex(dev.idProduct))
 
 def awsCallback(client, userdata, message):
-    print 'Hello world!'
     print 'Message: '
     print message.payload
 
@@ -42,16 +40,14 @@ def initAwsMqtt():
 # logarithmic average :
 #   10  * LOG(sum) - 10 * LOG(nbrOfValues) = 10 * LOG(sum / numberOfValues)
 def calculateLaeq15():
-    global laeq
-    global myMQTTClient
     sum = 0
     # print dbList
     for db in dbList:
         sum += math.pow(10, db/10.0)
     laeq = 10.0 * math.log10(sum/maxValues)
+    return laeq
 
 def signal_term_handler(signal, frame):
-    print 'got SIGTERM'
     myMQTTClient.disconnect()
     sys.exit(0)
 
@@ -73,10 +69,10 @@ try:
             index = 0
             # print laeq
         if (awsDelay == 299):
-            if (laeq > 0):
-                myMQTTClient.publish("pub", '{' + '"laeq15":' + '"' + str(laeq) + '"' + '}', 0)
+            laeq15 = calculateLaeq15()
+            if (laeq15 > 0):
+                myMQTTClient.publish("pub", '{' + '"laeq15":' + '"' + str(laeq15) + '"' + '}', 0)
             awsDelay = 0
 except KeyboardInterrupt:
-    print 'got Ctrl+C'
     myMQTTClient.disconnect()
     sys.exit(0)
