@@ -23,7 +23,6 @@ def awsCallback(client, userdata, message):
     print 'Message: '
     print message.payload
 
-# arn:aws:iot:eu-west-1:521595501823:thing/happyearsRaspberryPi
 def initAwsMqtt():
     # For certificate based connection
     global myMQTTClient
