@@ -1,0 +1,27 @@
+# unit configuration which enables the execution of this script using systemctl
+# following this documentaion it's possible to automatically start the script at PI start-up
+#
+# to install simply put this file into /lib/systemd/system/ and create a symbolic link to it in /etc/systemd/system/
+#
+# to start : sudo systemctl start happyears.service
+# to stop : sudo systemctl stop happyears.service
+# to make it run at boot : sudo systemctl enable happyears.service
+
+[Unit]
+Description=Happy ears gateway service
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+# Change the path to the script !
+ExecStart=/usr/bin/python2.7 /FULL/PATH/TO/SCRIPT.py
+TimeoutSec=30
+Restart=on-failure
+RestartSec=30
+StartLimitInterval=350
+StartLimitBurst=10
+
+[Install]
+WantedBy=multi-user.target
