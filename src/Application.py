@@ -4,12 +4,18 @@ import math
 import usb.core
 import time
 import logging
+import ConfigParser
+import os
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from datetime import datetime
 
+config = ConfigParser.ConfigParser()
+config.read(os.path.dirname(os.path.abspath(__file__)) + '/../conf/application.cfg')
+config.sections()
+
 logger = logging.getLogger('happyears')
-handler = logging.FileHandler('/home/pi/src/happyears/log/happyears.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+handler = logging.FileHandler(config.get('log', 'file'))
+formatter = logging.Formatter(config.get('log', 'format', 1))
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
@@ -34,15 +40,16 @@ def initUsb():
 def awsCallback(client, userdata, message):
     logger.info(message.payload)
 
+# arn:aws:iot:eu-west-1:521595501823:thing/happyearsRaspberryPi
 def initAwsMqtt():
     # For certificate based connection
     global myMQTTClient
     # myMQTTClient = AWSIoTMQTTClient("happyearsRaspberryPi")
-    myMQTTClient = AWSIoTMQTTClient("MyListenDevice")
+    myMQTTClient = AWSIoTMQTTClient(config.get('aws', 'client-name'))
     # Configurations
     # For TLS mutual authentication
-    myMQTTClient.configureEndpoint("", 8883)
-    myMQTTClient.configureCredentials("", "", "")
+    myMQTTClient.configureEndpoint(config.get('aws', 'endpoint'), config.get('aws', 'endpoint-port'))
+    myMQTTClient.configureCredentials(config.get('aws', 'root-ca'), config.get('aws', 'private-key'), config.get('aws', 'certificate'))
     myMQTTClient.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
     myMQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
     myMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
@@ -50,8 +57,8 @@ def initAwsMqtt():
     logger.info('Trying to connect to AWS')
     myMQTTClient.connect()
     logger.info('Connected to AWS')
-    myMQTTClient.subscribe("sub", 1, awsCallback)
-    logger.info('Subscribed to topic /sub')
+    myMQTTClient.subscribe(config.get('aws', 'subscription-topic'), 1, awsCallback)
+    logger.info('Subscribed to topic : ' + config.get('aws', 'subscription-topic'))
 
 # for formula see : http://forum.studiotips.com/viewtopic.php?f=1&t=2912
 # logarithmic average :
@@ -87,7 +94,8 @@ try:
         time.sleep(1)
         ret = dev.ctrl_transfer(0xC0, 4, 0, 0, 200)
         dB = (ret[0] + ((ret[1] & 3) * 256)) * 0.1 + 30
-#        logger.debug('red : ' +  str(dB))
+        if (logger.isEnabledFor(logging.DEBUG)):
+            logger.debug('red : ' +  str(dB))
         dbList[index] = dB
         db60List[index60] = dB
         index += 1
@@ -102,10 +110,14 @@ try:
             calculateLaeq60()
             if not laeq60 > 0:
                 laeq60 = 0
-#            logger.debug("Laeq : " + str(laeq))
+            if (logger.isEnabledFor(logging.DEBUG)):
+                logger.debug("Laeq : " + str(laeq))
+                logger.debug("Laeq60 : " + str(laeq60))
             if (laeq > 0):
                 currentDatetime = datetime.today().isoformat()
-                myMQTTClient.publish("pub", '{"deviceId":"", "date":"' + currentDatetime + '", "Laeq15":' + '"' + str(laeq) + '", "Laeq60":"' + str(laeq60) + '", "Lceq15":"0", "Lceq60":"0"}', 0)
+                if (logger.isEnabledFor(logging.DEBUG)):
+                    logger.debug('Sending : ' + '{"deviceId":"b7072dd6-444a-4fd9-b75c-dc215a04831f", "date":"' + currentDatetime + '", "Laeq15":' + '"' + str(laeq) + '", "Laeq60":"' + str(laeq) + '", "Lceq15":"0", "Lceq60":"0"}')
+                myMQTTClient.publish(config.get('aws', 'publish-topic'), '{"deviceId":"' + config.get('aws', 'device-id') + '", "date":"' + currentDatetime + '", "Laeq15":' + '"' + str(laeq) + '", "Laeq60":"' + str(laeq60) + '", "Lceq15":"0", "Lceq60":"0"}', 0)
             awsDelay = 0
 except KeyboardInterrupt:
     logger.warning('got Ctrl+C')
