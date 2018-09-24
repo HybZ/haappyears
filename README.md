@@ -42,7 +42,7 @@ Various parts are configurable through [configuration file](https://github.com/H
 
 ## Exchanged data
 
-This application is specific to the CIRB-CIBG IOT platform. The data must respect a contract which is represented by the following Json :
+This application is specific to the CIRB-CIBG IOT platform. The data is sent every 5 minutes and it must respect a contract which is represented by the following Json :
 
 ```json
 {
@@ -55,7 +55,7 @@ This application is specific to the CIRB-CIBG IOT platform. The data must respec
 }
 ```
 
-To learn more about the meaning of Laeq values please refer to a sound specilized site such as : [http://www.gracey.co.uk/basics/leq-b1.htm]()http://www.gracey.co.uk/basics/leq-b1.htm)
+To learn more about the meaning of Laeq values please refer to a sound specilized site such as : http://www.gracey.co.uk/basics/leq-b1.htm
 
 ## Lisence 
 Apache 2.0
