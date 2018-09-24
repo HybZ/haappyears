@@ -10,11 +10,6 @@ This application is inspired by Brussels' amplified sound use case which is know
 
 This application, which is designed for a [Raspberry Pi 3](https://www.raspberrypi.org/), acts as a Gateway for a [Wensn ws1361](http://www.wensn.com/html_products/WS1361-17.html) sound meter device. It reads every second the sound level from the device connected via USB and calculates a logarithmic mean value for the last 15 and 60 minutes then publishes the data every 5 minutes on an [AWS IoT](https://aws.amazon.com/iot/) topic using MQTT protocol.
 
-Various parts are configuyrable through [configuration file](https://github.com/HybZ/haappyears/blob/master/conf/application.cfg). Among them :
-* AWS credentials
-* MQTT subrscription and publication topics
-* Current device ID 
-
 ## Requirements
 
 A Raspberry Pi
@@ -37,6 +32,30 @@ Simply execute `sudo python Application.py`
 ### As a systemctl service
 
 Refer to [happyears.service](https://github.com/HybZ/haappyears/blob/master/happyears.service) comments in order create a systemctl service.
+
+## How to configure
+
+Various parts are configurable through [configuration file](https://github.com/HybZ/haappyears/blob/master/conf/application.cfg). Among them :
+* AWS credentials
+* MQTT subscription and publication topics
+* Current device ID 
+
+## Exchanged data
+
+This application is specific to the CIRB-CIBG IOT platform. The data must respect a contract which is represented by the following Json :
+
+```json
+{
+  "deviceId":"12345678-90ab-cdef-1234-567890abcdef", 
+  "date":"20180101T00:00:00", 
+  "Laeq15":"0", 
+  "Laeq60":"0", 
+  "Lceq15":"0", 
+  "Lceq60":"0"
+}
+```
+
+To learn more about the meaning of Laeq values please refer to a sound specilized site such as : [http://www.gracey.co.uk/basics/leq-b1.htm]()http://www.gracey.co.uk/basics/leq-b1.htm)
 
 ## Lisence 
 Apache 2.0
