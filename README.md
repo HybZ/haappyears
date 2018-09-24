@@ -8,7 +8,12 @@ This application is inspired by Brussels' amplified sound use case which is know
 
 ## Introduction
 
-This application, which is designed for a [Raspberry Pi 3](https://www.raspberrypi.org/), acts as a Gateway for a [Wensn ws1361](http://www.wensn.com/html_products/WS1361-17.html) sound meter device. It reads sound levels from the device connected via USB and calculates a logarithmic mean value for both 15 and 60 minutes then publishes the data on an [AWS IoT](https://aws.amazon.com/iot/) topic using MQTT protocol.
+This application, which is designed for a [Raspberry Pi 3](https://www.raspberrypi.org/), acts as a Gateway for a [Wensn ws1361](http://www.wensn.com/html_products/WS1361-17.html) sound meter device. It reads every second the sound level from the device connected via USB and calculates a logarithmic mean value for the last 15 and 60 minutes then publishes the data every 5 minutes on an [AWS IoT](https://aws.amazon.com/iot/) topic using MQTT protocol.
+
+Various parts are configuyrable through [configuration file](https://github.com/HybZ/haappyears/blob/master/conf/application.cfg). Among them :
+* AWS credentials
+* MQTT subrscription and publication topics
+* Current device ID 
 
 ## Requirements
 

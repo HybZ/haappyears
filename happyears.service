@@ -1,3 +1,4 @@
+# The following script was tested on RedHat 7.2
 # unit configuration which enables the execution of this script using systemctl
 # following this documentaion it's possible to automatically start the script at PI start-up
 #
