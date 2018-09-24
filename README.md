@@ -12,10 +12,10 @@ This application, which is designed for a [Raspberry Pi 3](https://www.raspberry
 
 ## Requirements
 
-A Raspberry Pi
-A Wensn ws1364
-An AWS account with a configured IoT device. You will need the certificate, root_ca and private key.
-Python 2.7
+* A Raspberry Pi
+* A Wensn ws1364
+* An AWS account with a configured IoT device. You will need the certificate, root_ca and private key.
+* Python 2.7
 
 On your Raspberry Pi, make sure that ntp is running and that date is correctly configured for your timezone, for Raspian Jetty run `sudo dpkg-reconfigure tzdata`
 
